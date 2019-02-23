@@ -1,0 +1,110 @@
+<html>
+
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+    .upload-image{
+        width:100px;
+        height: 100px;
+        background: #F00;
+    }
+    .upload-image.is-dragover{
+        background: #0F0;
+    }
+    </style>
+
+</head>
+
+<body>
+
+
+
+
+    <script>
+        function dragHandler(e) {
+            console.log('--------drag')
+            e.preventDefault(); //防止瀏覽器執行預設動作
+            e.target.classList.add( 'is-dragover' );
+        }
+
+        function dragleave(e) {
+            console.log('--------drag')
+            e.preventDefault(); //防止瀏覽器執行預設動作
+            e.target.classList.remove( 'is-dragover' );
+        }
+
+        function drop_image(e) {
+            console.log('--------drop')
+            e.preventDefault(); //防止瀏覽器執行預設動作
+            e.target.classList.remove( 'is-dragover' );
+
+            // var files  = e.dataTransfer.files ; //擷取拖曳的檔案
+
+
+            /* 把擷取到的檔案用POST送到後端去 */
+            var objXhr = new XMLHttpRequest();
+            var url = '/upload-multi'; //上傳圖檔的後端程式位置
+            objXhr.upload.addEventListener("progress", function (evt) {
+                if (evt.lengthComputable) {
+                    var percent = (evt.loaded / evt.total) * 100;
+                    document.getElementById('progressBar').value = percent;
+                    // console.log("add upload event-listener" + evt.loaded + "/" + evt.total);
+                } else {
+                    console.log('not support')
+                }
+            }, false);
+
+            objXhr.open('POST', url);
+            var objForm = new FormData();
+            var files = e.dataTransfer.files;
+            console.log('files',files);
+            objForm.append("path", "AAA");
+            console.log('objForm',objForm);
+            for (var i = 0; i < files.length; i++) // 把檔案加入表單中
+            {
+                // if (!files[i].type.match('image')) {
+                //     var name = files[i].name;
+                //     alert(name + '無法上傳！請拖曳圖片檔案！');
+                //     continue;
+                // }
+                objForm.append('filegroup', files[i]);
+            }
+            objXhr.onload = function (e) //上傳完成時
+            {
+                /*接收後端傳回的Response，本範例的後端程式會傳回每個圖檔是否都上傳成功，以及上傳成功的圖片數量*/
+                var arrData = JSON.parse(objXhr.responseText);
+
+            }
+            console.log('---',objForm);
+            for (var pair of objForm.entries()) {
+                console.log(pair[0]+ ', ' + pair[1]); 
+            }
+            objXhr.send(objForm);
+        }
+        function clickls(){
+            var objForm = new FormData();
+            objForm.append("path", "AAA");
+            // console.log('objForm',objForm);
+            // Display the key/value pairs
+            for (var pair of objForm.entries()) {
+                console.log(pair[0]+ ', ' + pair[1]); 
+            }
+        }
+    </script>
+<iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
+    <form action="/upload-multi" method="post" enctype="multipart/form-data" target="dummyframe">
+        <h2>多图上传</h2>
+        <input type="file" name="filegroup">
+        <input type="submit" value="提交">
+    </form>
+
+    <br/>
+    <div><span>drag file into the following div will auto upload</span></div>
+
+    <div ondragover="javascript: dragHandler(event);" ondragleave="javascript: dragleave(event);" ondrop="javascript: drop_image(event);" id="drop_image" class="upload-image"></div>
+    <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
+
+    <!-- <button onclick="clickls()">click</button> -->
+</body>
+
+</html>

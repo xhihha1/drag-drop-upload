@@ -1,0 +1,9 @@
+---
+applications:
+- name: sc-website
+  command: node server/app.js
+  memory: 128M
+  instances: 1
+  health-check-type: process
+  version: 1.0.0
+  random-route: true
