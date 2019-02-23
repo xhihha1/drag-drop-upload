@@ -9,3 +9,5 @@ node server/app.js
 # In frontend  
 
 Set form's file input name=filegroup.
+
+http://localhost:8081/drag
